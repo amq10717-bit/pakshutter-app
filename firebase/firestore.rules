@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // An admin is any signed-in user whose UID has a document in /admins
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function str(v, maxLen) {
+      return v is string && v.size() <= maxLen;
+    }
+
+    // Public content: everyone can read, only admins can change
+    match /settings/{docId}      { allow read: if true; allow write: if isAdmin(); }
+    match /services/{docId}      { allow read: if true; allow write: if isAdmin(); }
+    match /shutterTypes/{docId}  { allow read: if true; allow write: if isAdmin(); }
+    match /gallery/{docId}       { allow read: if true; allow write: if isAdmin(); }
+    match /testimonials/{docId}  { allow read: if true; allow write: if isAdmin(); }
+    match /media/{docId}         { allow read: if true; allow write: if isAdmin(); }
+
+    // Admin list: a user may only check their own admin record; created in the console
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Quote requests: customers can only create; only admins can read/update/delete
+    match /inquiries/{docId} {
+      allow create: if
+        request.resource.data.keys().hasOnly(['name', 'phone', 'address', 'email', 'service', 'shutterType',
+          'width', 'height', 'quantity', 'message', 'contactBy', 'status', 'source', 'createdAt'])
+        && str(request.resource.data.name, 100) && request.resource.data.name.size() >= 2
+        && str(request.resource.data.phone, 20) && request.resource.data.phone.size() >= 10
+        && str(request.resource.data.address, 400)
+        && str(request.resource.data.email, 120)
+        && str(request.resource.data.service, 120)
+        && str(request.resource.data.shutterType, 120)
+        && str(request.resource.data.width, 10)
+        && str(request.resource.data.height, 10)
+        && str(request.resource.data.quantity, 10)
+        && str(request.resource.data.message, 1500)
+        && str(request.resource.data.contactBy, 20)
+        && str(request.resource.data.source, 20)
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
