@@ -8,7 +8,7 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    function str(v, maxLen) {
+    function isStr(v, maxLen) {
       return v is string && v.size() <= maxLen;
     }
 
@@ -31,20 +31,20 @@ service cloud.firestore {
       allow create: if
         request.resource.data.keys().hasOnly(['name', 'phone', 'address', 'email', 'service', 'shutterType',
           'width', 'height', 'quantity', 'message', 'contactBy', 'status', 'source', 'createdAt'])
-        && str(request.resource.data.name, 100) && request.resource.data.name.size() >= 2
-        && str(request.resource.data.phone, 20) && request.resource.data.phone.size() >= 10
-        && str(request.resource.data.address, 400)
-        && str(request.resource.data.email, 120)
-        && str(request.resource.data.service, 120)
-        && str(request.resource.data.shutterType, 120)
-        && str(request.resource.data.width, 10)
-        && str(request.resource.data.height, 10)
-        && str(request.resource.data.quantity, 10)
-        && str(request.resource.data.message, 1500)
-        && str(request.resource.data.contactBy, 20)
-        && str(request.resource.data.source, 20)
-        && request.resource.data.status == 'new'
-        && request.resource.data.createdAt == request.time;
+        && isStr(request.resource.data['name'], 100) && request.resource.data['name'].size() >= 2
+        && isStr(request.resource.data['phone'], 20) && request.resource.data['phone'].size() >= 10
+        && isStr(request.resource.data['address'], 400)
+        && isStr(request.resource.data['email'], 120)
+        && isStr(request.resource.data['service'], 120)
+        && isStr(request.resource.data['shutterType'], 120)
+        && isStr(request.resource.data['width'], 10)
+        && isStr(request.resource.data['height'], 10)
+        && isStr(request.resource.data['quantity'], 10)
+        && isStr(request.resource.data['message'], 1500)
+        && isStr(request.resource.data['contactBy'], 20)
+        && isStr(request.resource.data['source'], 20)
+        && request.resource.data['status'] == 'new'
+        && request.resource.data['createdAt'] == request.time;
       allow read, update, delete: if isAdmin();
     }
   }
