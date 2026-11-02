@@ -5,6 +5,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -66,3 +69,25 @@ jobs:
           name: pakshutter-android
           path: out/
           retention-days: 30
+
+      - name: Publish as a GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Pak Shutter build ${{ github.run_number }}
+          body: |
+            PakShutter.apk - install directly on Android phones.
+            PakShutter-PlayStore.aab - upload to Google Play Console.
+          files: |
+            out/PakShutter.apk
+            out/PakShutter-PlayStore.aab
+
+      - name: Store latest build on the builds branch
+        run: |
+          cd out
+          git init -q -b builds
+          git config user.name "build-bot"
+          git config user.email "build-bot@users.noreply.github.com"
+          git add PakShutter.apk PakShutter-PlayStore.aab
+          git commit -q -m "Build ${{ github.run_number }} (${{ github.sha }})"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" builds
