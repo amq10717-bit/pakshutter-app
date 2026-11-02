@@ -4,12 +4,12 @@
 // quote requests are sent through WhatsApp instead of being saved.
 
 export const firebaseConfig = {
-  apiKey: 'PASTE_API_KEY',
-  authDomain: 'PASTE_PROJECT_ID.firebaseapp.com',
-  projectId: 'PASTE_PROJECT_ID',
-  storageBucket: 'PASTE_PROJECT_ID.firebasestorage.app',
-  messagingSenderId: 'PASTE_SENDER_ID',
-  appId: 'PASTE_APP_ID',
+  apiKey: 'AIzaSyCD7qgNz-72O2EojbMoCfXokfzTe07oY5k',
+  authDomain: 'pak-shutter-1ef6c.firebaseapp.com',
+  projectId: 'pak-shutter-1ef6c',
+  storageBucket: 'pak-shutter-1ef6c.firebasestorage.app',
+  messagingSenderId: '78022416095',
+  appId: '1:78022416095:web:76fc01aab7426591a7bb6a',
 };
 
 export const isFirebaseConfigured =
